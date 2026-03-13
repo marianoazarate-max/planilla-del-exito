@@ -479,14 +479,38 @@ function thead(gridClass, showQty) {
   </div>`;
 }
 
+// Parse numbers from sheet — handles both $12,330.10 and $12.330,10
+function parseNum(s) {
+  const clean = s.replace(/[^0-9.,]/g, '');
+  // If has comma and dot: figure out which is decimal separator
+  if (clean.includes(',') && clean.includes('.')) {
+    const lastComma = clean.lastIndexOf(',');
+    const lastDot   = clean.lastIndexOf('.');
+    // Whichever comes last is the decimal separator
+    if (lastComma > lastDot) {
+      return parseFloat(clean.replace(/\./g, '').replace(',', '.'));
+    } else {
+      return parseFloat(clean.replace(/,/g, ''));
+    }
+  }
+  // Only comma — likely thousands separator (12,330) or decimal (1,5)
+  if (clean.includes(',')) {
+    const parts = clean.split(',');
+    return parts[parts.length - 1].length === 2
+      ? parseFloat(clean.replace(',', '.'))  // decimal
+      : parseFloat(clean.replace(/,/g, '')); // thousands
+  }
+  return parseFloat(clean);
+}
+
 function parseLive(csv) {
   const live = {};
   for (const line of csv.split('\n')) {
     const c = line.split(',').map(x => x.replace(/"/g,'').trim());
     if (c[0] === 'Bitcoin')  live.btc = parseFloat(c[1].replace(/[$, ]/g,''));
     if (c[0] === 'Ethereum') live.eth = parseFloat(c[1].replace(/[$, ]/g,''));
-    if (c[0] === 'Total'    && c[1] && !live.tv) { const v = parseFloat(c[1].replace(/[^0-9.]/g,'')); if (!isNaN(v)) live.tv = v; }
-    if (c[0] === 'Invested' && c[1] && !live.ti) { const v = parseFloat(c[1].replace(/[^0-9.]/g,'')); if (!isNaN(v)) live.ti = v; }
+    if (c[0] === 'Total'    && c[1] && !live.tv) { const v = parseNum(c[1]); if (!isNaN(v)) live.tv = v; }
+    if (c[0] === 'Invested' && c[1] && !live.ti) { const v = parseNum(c[1]); if (!isNaN(v)) live.ti = v; }
   }
   return live;
 }
