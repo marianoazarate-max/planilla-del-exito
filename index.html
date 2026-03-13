@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0048)file:///Users/mzarate/Downloads/planilla_v2.html -->
+<!-- saved from url=(0050)file:///Users/mzarate/Downloads/planilla_v2_1.html -->
 <html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -20,8 +20,8 @@
     --accent2: #7c6dfa;
     --red: #ff4d6d;
     --amber: #f59e0b;
-    --mono: 'Space Mono', monospace;
-    --sans: 'Syne', sans-serif;
+    --mono: 'Space Mono', 'Courier New', monospace;
+    --sans: 'Syne', 'Helvetica Neue', sans-serif;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -400,7 +400,7 @@
   </div>
   <div class="header-right">
     <div class="header-badge">IOL · BYMA · CRYPTO</div>
-    <div class="last-update">12/3/26, 11:33 p.&nbsp;m.</div>
+    <div class="last-update">12/3/26, 11:37 p.&nbsp;m.</div>
   </div>
 </header>
 
@@ -894,12 +894,16 @@ function splitCSV(line) {
 
 function parseLive(csv) {
   const live = {};
-  for (const line of csv.split('\n')) {
-    const c = splitCSV(line);
-    if (c[0] === 'Bitcoin')  live.btc = parseFloat(c[1].replace(/[$, ]/g,''));
-    if (c[0] === 'Ethereum') live.eth = parseFloat(c[1].replace(/[$, ]/g,''));
-    if (c[0] === 'Total'    && c[1] && !live.tv) { const v = parseNum(c[1]); if (!isNaN(v)) live.tv = v; }
-    if (c[0] === 'Invested' && c[1] && !live.ti) { const v = parseNum(c[1]); if (!isNaN(v)) live.ti = v; }
+  const lines = csv.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const c = splitCSV(lines[i]);
+    // Total and Invested only from first 4 lines (summary rows at top)
+    if (i < 4) {
+      if (c[0] === 'Total'    && c[1] && !live.tv) { const v = parseNum(c[1]); if (!isNaN(v) && v < 1000000) live.tv = v; }
+      if (c[0] === 'Invested' && c[1] && !live.ti) { const v = parseNum(c[1]); if (!isNaN(v) && v < 1000000) live.ti = v; }
+    }
+    if (c[0] === 'Bitcoin')  { const v = parseFloat(c[1].replace(/[^0-9.]/g,'')); if (!isNaN(v)) live.btc = v; }
+    if (c[0] === 'Ethereum') { const v = parseFloat(c[1].replace(/[^0-9.]/g,'')); if (!isNaN(v)) live.eth = v; }
   }
   return live;
 }
