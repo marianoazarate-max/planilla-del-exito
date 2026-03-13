@@ -2,756 +2,303 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Planilla del Éxito</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f;
-    --bg2: #111118;
-    --bg3: #18181f;
-    --border: rgba(255,255,255,0.06);
-    --border2: rgba(255,255,255,0.12);
-    --text: #e8e8f0;
-    --muted: #6b6b80;
-    --accent: #00e5a0;
-    --accent2: #7c6dfa;
-    --red: #ff4d6d;
-    --amber: #f59e0b;
-    --green: #00e5a0;
-    --mono: 'Space Mono', monospace;
-    --sans: 'Syne', sans-serif;
+    --bg: #0a0a0f; --bg2: #111118; --bg3: #18181f;
+    --border: rgba(255,255,255,0.06); --border2: rgba(255,255,255,0.12);
+    --text: #e8e8f0; --muted: #6b6b80;
+    --green: #00e5a0; --accent2: #7c6dfa; --red: #ff4d6d; --amber: #f59e0b;
+    --mono: 'Space Mono', monospace; --sans: 'Syne', sans-serif;
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    min-height: 100vh;
-    overflow-x: hidden;
+    background: var(--bg); color: var(--text); font-family: var(--sans);
+    min-height: 100vh; overflow-x: hidden;
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
   }
-
-  /* Grid background */
   body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image: linear-gradient(rgba(0,229,160,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,160,0.025) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
+  .container { max-width: 1100px; margin: 0 auto; padding: 20px 14px 56px; position: relative; z-index: 1; }
 
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 40px 24px 80px;
-    position: relative;
-    z-index: 1;
-  }
+  #loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; gap: 20px; }
+  .spinner { width: 32px; height: 32px; border: 2px solid var(--border2); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading p { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.1em; text-align: center; line-height: 1.8; }
+  #error { display: none; text-align: center; padding: 60px 20px; font-family: var(--mono); color: var(--red); font-size: 12px; line-height: 1.8; }
+  #dashboard { display: none; }
 
-  /* Header */
-  header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 48px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--border);
-  }
-  .logo-area h1 {
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: #fff;
-  }
-  .logo-area h1 span { color: var(--accent); }
-  .logo-area p {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 4px;
-    letter-spacing: 0.1em;
-  }
-  .header-badge {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent);
-    background: rgba(0,229,160,0.08);
-    border: 1px solid rgba(0,229,160,0.2);
-    padding: 6px 14px;
-    border-radius: 4px;
-    letter-spacing: 0.08em;
-  }
+  /* HEADER */
+  header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border); gap: 10px; }
+  .logo-area h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #fff; line-height: 1.1; }
+  .logo-area h1 span { color: var(--green); }
+  .logo-area p { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-top: 5px; letter-spacing: 0.07em; }
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+  .header-badge { font-family: var(--mono); font-size: 9px; color: var(--green); background: rgba(0,229,160,0.08); border: 1px solid rgba(0,229,160,0.2); padding: 4px 9px; border-radius: 4px; letter-spacing: 0.05em; white-space: nowrap; }
+  .last-update { font-family: var(--mono); font-size: 9px; color: var(--muted); }
 
-  /* KPI cards */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 40px;
-  }
-  .kpi {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-  .kpi:hover { border-color: var(--border2); }
-  .kpi::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-  }
-  .kpi.green::after { background: var(--green); }
-  .kpi.accent2::after { background: var(--accent2); }
-  .kpi.amber::after { background: var(--amber); }
-  .kpi.red::after { background: var(--red); }
-  .kpi-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-  .kpi-val {
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: -1px;
-    line-height: 1;
-  }
-  .kpi-val.green { color: var(--green); }
-  .kpi-val.accent2 { color: var(--accent2); }
-  .kpi-val.amber { color: var(--amber); }
-  .kpi-val.red { color: var(--red); }
-  .kpi-sub {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 6px;
-  }
+  /* KPI */
+  .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+  .kpi { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 12px; position: relative; overflow: hidden; }
+  .kpi::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .kpi.g::after { background: var(--green); } .kpi.p::after { background: var(--accent2); }
+  .kpi.a::after { background: var(--amber); } .kpi.r::after { background: var(--red); }
+  .kpi-label { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 7px; }
+  .kpi-val { font-size: 19px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; }
+  .kpi-val.g { color: var(--green); } .kpi-val.p { color: var(--accent2); }
+  .kpi-val.a { color: var(--amber); } .kpi-val.r { color: var(--red); }
+  .kpi-sub { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-top: 4px; }
 
-  /* Section title */
-  .sec-title {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .sec-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
+  /* SECTION TITLE */
+  .sec-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 9px; display: flex; align-items: center; gap: 8px; }
+  .sec-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  /* Allocation bar section */
-  .alloc-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 40px;
-  }
-  .alloc-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 24px;
-  }
-  .alloc-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 20px;
-  }
-  .alloc-item {
-    margin-bottom: 14px;
-  }
-  .alloc-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 6px;
-  }
-  .alloc-name {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text);
-  }
-  .alloc-nums {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .bar-track {
-    height: 4px;
-    background: var(--bg3);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .bar-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 1s ease;
-  }
+  /* POSITIONS CARD — mobile card layout */
+  .positions-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
 
-  /* Main positions table */
-  .positions-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-bottom: 40px;
-    overflow: hidden;
-  }
-  .pos-header {
-    display: grid;
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--border);
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .pos-header.cedear-grid { grid-template-columns: 90px 60px 90px 90px 90px 90px 80px; }
-  .pos-header.simple-grid { grid-template-columns: 90px 60px 90px 90px 90px 80px; }
-  .pos-row {
-    display: grid;
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    align-items: center;
-    transition: background 0.15s;
-    cursor: default;
-  }
-  .pos-row:last-child { border-bottom: none; }
-  .pos-row:hover { background: rgba(255,255,255,0.02); }
-  .pos-row.cedear-grid { grid-template-columns: 90px 60px 90px 90px 90px 90px 80px; }
-  .pos-row.simple-grid { grid-template-columns: 90px 60px 90px 90px 90px 80px; }
-  .pos-ticker {
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 700;
-    color: #fff;
-  }
-  .pos-qty {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .pos-num {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--text);
-  }
-  .pos-pnl {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 700;
-  }
-  .pos-pnl.pos { color: var(--green); }
-  .pos-pnl.neg { color: var(--red); }
-  .pct-pill {
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 4px;
-  }
-  .pct-pill.pos { background: rgba(0,229,160,0.12); color: var(--green); }
-  .pct-pill.neg { background: rgba(255,77,109,0.12); color: var(--red); }
-  .pct-pill.neutral { background: rgba(245,158,11,0.12); color: var(--amber); }
+  .cat-label { padding: 6px 14px; background: var(--bg3); font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent2); border-bottom: 1px solid var(--border); }
 
-  /* mini spark bar */
-  .spark {
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    height: 28px;
-  }
-  .spark-bar {
-    width: 4px;
-    border-radius: 1px;
-    background: var(--accent2);
-    opacity: 0.5;
-  }
-  .spark-bar.last { opacity: 1; background: var(--accent); }
+  /* Mobile cards (always visible on mobile, hidden on desktop) */
+  .pos-cards { display: flex; flex-direction: column; }
+  .pos-card { display: grid; grid-template-columns: 1fr auto; padding: 11px 14px; border-bottom: 1px solid var(--border); gap: 4px; align-items: start; }
+  .pos-card:last-child { border-bottom: none; }
+  .pos-card:active { background: rgba(255,255,255,0.02); }
+  .pos-card-left { display: flex; flex-direction: column; gap: 3px; }
+  .pos-card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .ticker { font-family: var(--mono); font-size: 14px; font-weight: 700; color: #fff; }
+  .inv-detail { font-family: var(--mono); font-size: 9px; color: var(--muted); }
+  .inv-detail span { color: var(--text); }
+  .val-main { font-family: var(--mono); font-size: 13px; font-weight: 700; }
+  .val-pnl { font-family: var(--mono); font-size: 10px; font-weight: 700; }
+  .pos-c { color: var(--green); } .neg-c { color: var(--red); }
+  .pill { display: inline-block; font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+  .pill-pos { background: rgba(0,229,160,0.12); color: var(--green); }
+  .pill-neg { background: rgba(255,77,109,0.12); color: var(--red); }
+  .pill-neu { background: rgba(245,158,11,0.12); color: var(--amber); }
 
-  /* Category label */
-  .cat-row {
-    padding: 8px 20px;
-    background: var(--bg3);
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--accent2);
-    border-bottom: 1px solid var(--border);
-  }
+  /* Desktop table (hidden on mobile) */
+  .pos-table { display: none; }
+  .pos-header { display: grid; grid-template-columns: 90px 55px 90px 90px 85px 75px; padding: 10px 16px; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .pos-row-d { display: grid; grid-template-columns: 90px 55px 90px 90px 85px 75px; padding: 12px 16px; border-bottom: 1px solid var(--border); align-items: center; transition: background 0.15s; }
+  .pos-row-d:last-child { border-bottom: none; }
+  .pos-row-d:hover { background: rgba(255,255,255,0.02); }
+  .num { font-family: var(--mono); font-size: 12px; }
+  .qty { font-family: var(--mono); font-size: 11px; color: var(--muted); }
 
-  /* GD35 special card */
-  .gd35-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--amber);
-    border-radius: 8px;
-    padding: 24px;
-    margin-bottom: 40px;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 24px;
-    align-items: start;
-  }
-  .gd35-title {
-    font-family: var(--mono);
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--amber);
-    margin-bottom: 4px;
-  }
-  .gd35-sub {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .gd35-stat { }
-  .gd35-stat-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 4px;
-  }
-  .gd35-stat-val {
-    font-family: var(--mono);
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-  }
-  .gd35-note {
-    font-size: 12px;
-    color: var(--muted);
-    background: rgba(245,158,11,0.06);
-    border: 1px solid rgba(245,158,11,0.15);
-    border-radius: 6px;
-    padding: 12px;
-    line-height: 1.6;
-    grid-column: 1 / -1;
-  }
+  /* Two col layout */
+  .two-col { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+
+  /* GD35 */
+  .gd35-card { background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--amber); border-radius: 10px; padding: 16px; margin-bottom: 28px; }
+  .gd35-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .gd35-stat-label { font-family: var(--mono); font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+  .gd35-stat-val { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text); }
+  .gd35-note { font-size: 11px; color: var(--muted); background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.15); border-radius: 6px; padding: 11px; line-height: 1.7; }
   .gd35-note strong { color: var(--amber); font-family: var(--mono); }
 
-  /* Footer */
-  footer {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-    text-align: center;
-    padding-top: 32px;
-    border-top: 1px solid var(--border);
-    letter-spacing: 0.08em;
-  }
+  footer { font-family: var(--mono); font-size: 9px; color: var(--muted); text-align: center; padding-top: 20px; border-top: 1px solid var(--border); letter-spacing: 0.05em; line-height: 2; }
 
-  /* Responsive */
-  @media (max-width: 700px) {
-    .kpi-grid { grid-template-columns: 1fr 1fr; }
-    .alloc-grid { grid-template-columns: 1fr; }
-    .pos-header.cedear-grid,
-    .pos-row.cedear-grid { grid-template-columns: 80px 55px 80px 80px 70px; }
-    .pos-header.cedear-grid .col-val,
-    .pos-row.cedear-grid .col-val { display: none; }
-    .gd35-card { grid-template-columns: 1fr 1fr; }
+  /* DESKTOP overrides */
+  @media (min-width: 700px) {
+    .container { padding: 40px 24px 80px; }
+    header { align-items: flex-end; }
+    .logo-area h1 { font-size: 28px; }
+    .logo-area p, .last-update { font-size: 11px; }
+    .header-badge { font-size: 11px; padding: 6px 14px; }
+    .kpi-grid { grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 40px; }
+    .kpi { padding: 20px; }
+    .kpi-label, .kpi-sub { font-size: 10px; }
+    .kpi-val { font-size: 26px; }
+    .sec-title { font-size: 11px; margin-bottom: 14px; }
+    .pos-cards { display: none; }
+    .pos-table { display: block; }
+    .two-col { flex-direction: row; margin-bottom: 32px; }
+    .two-col > * { flex: 1; }
+    .gd35-grid { grid-template-columns: repeat(4,1fr); }
+    .gd35-stat-val { font-size: 16px; }
+    footer { font-size: 10px; }
   }
 </style>
 </head>
 <body>
 <div class="container">
-
-  <header>
-    <div class="logo-area">
-      <h1>Planilla del <span>Éxito</span></h1>
-      <p>PORTFOLIO TRACKER · ACTUALIZADO A FECHA DE DATOS</p>
-    </div>
-    <div class="header-badge">IOL · BYMA · CRYPTO</div>
-  </header>
-
-  <!-- KPIs -->
-  <div class="sec-title">Resumen general</div>
-  <div class="kpi-grid">
-    <div class="kpi green">
-      <div class="kpi-label">Valor total</div>
-      <div class="kpi-val green">$12.330</div>
-      <div class="kpi-sub">USD a tipo MEP</div>
-    </div>
-    <div class="kpi accent2">
-      <div class="kpi-label">Total invertido</div>
-      <div class="kpi-val accent2">$7.788</div>
-      <div class="kpi-sub">USD histórico</div>
-    </div>
-    <div class="kpi green">
-      <div class="kpi-label">Ganancia total</div>
-      <div class="kpi-val green">+$4.543</div>
-      <div class="kpi-sub">USD netos</div>
-    </div>
-    <div class="kpi green">
-      <div class="kpi-label">Retorno</div>
-      <div class="kpi-val green">+58.3%</div>
-      <div class="kpi-sub">desde origen</div>
-    </div>
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>CARGANDO DATOS<br>DE LA PLANILLA...</p>
   </div>
-
-  <!-- Allocation -->
-  <div class="sec-title">Composición del portafolio</div>
-  <div class="alloc-grid">
-    <div class="alloc-card">
-      <div class="alloc-title">Por categoría — valor actual</div>
-
-      <div class="alloc-item">
-        <div class="alloc-header">
-          <span class="alloc-name">CEDEARs</span>
-          <span class="alloc-nums">$9.969 · 80.9%</span>
-        </div>
-        <div class="bar-track"><div class="bar-fill" style="width:80.9%;background:#7c6dfa"></div></div>
-      </div>
-      <div class="alloc-item">
-        <div class="alloc-header">
-          <span class="alloc-name">Cripto</span>
-          <span class="alloc-nums">$1.822 · 14.8%</span>
-        </div>
-        <div class="bar-track"><div class="bar-fill" style="width:14.8%;background:#f59e0b"></div></div>
-      </div>
-      <div class="alloc-item">
-        <div class="alloc-header">
-          <span class="alloc-name">Acciones ARG</span>
-          <span class="alloc-nums">$539 · 4.3%</span>
-        </div>
-        <div class="bar-track"><div class="bar-fill" style="width:4.3%;background:#00e5a0"></div></div>
-      </div>
-      <div class="alloc-item">
-        <div class="alloc-header">
-          <span class="alloc-name">GD35 Bono</span>
-          <span class="alloc-nums">inv. $617 · ?%</span>
-        </div>
-        <div class="bar-track"><div class="bar-fill" style="width:5%;background:#f59e0b;opacity:0.4"></div></div>
-      </div>
-    </div>
-
-    <div class="alloc-card">
-      <div class="alloc-title">Top performers — retorno %</div>
-      <div class="alloc-item">
-        <div class="alloc-header">
-          <span class="alloc-name">TSLA</span>
-          <span class="alloc-nums" style="color:var(--green)">+154.6%</span>
-        </div>
-        <div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--green)"></div></div>
-      </div>
-      <div class="alloc-item">
-        <div class="alloc-header">
-          <span class="alloc-name">GOOGL</span>
-          <span class="alloc-nums" style="color:var(--green)">+105.8%</span>
-        </div>
-        <div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--green)"></div></div>
-      </div>
-      <div class="alloc-item">
-        <div class="alloc-header">
-          <span class="alloc-name">NVDA</span>
-          <span class="alloc-nums" style="color:var(--green)">+104.4%</span>
-        </div>
-        <div class="bar-track"><div class="bar-fill" style="width:67%;background:var(--green)"></div></div>
-      </div>
-      <div class="alloc-item">
-        <div class="alloc-header">
-          <span class="alloc-name">YPFD</span>
-          <span class="alloc-nums" style="color:var(--green)">+130.9%</span>
-        </div>
-        <div class="bar-track"><div class="bar-fill" style="width:85%;background:var(--accent2)"></div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CEDEARs table -->
-  <div class="sec-title">CEDEARs</div>
-  <div class="positions-card">
-    <div class="pos-header cedear-grid">
-      <span>Ticker</span>
-      <span>Qty</span>
-      <span>Invertido</span>
-      <span>Valor USD</span>
-      <span class="col-val">P&L USD</span>
-      <span>Retorno</span>
-      <span>Tranches</span>
-    </div>
-
-    <!-- NVDA -->
-    <div class="pos-row cedear-grid">
-      <span class="pos-ticker">NVDA</span>
-      <span class="pos-qty">350</span>
-      <span class="pos-num">$1.365</span>
-      <span class="pos-num">$2.790</span>
-      <span class="pos-pnl pos col-val">+$1.425</span>
-      <span><span class="pct-pill pos">+104.4%</span></span>
-      <div class="spark">
-        <div class="spark-bar" style="height:30%"></div>
-        <div class="spark-bar" style="height:55%"></div>
-        <div class="spark-bar" style="height:80%"></div>
-        <div class="spark-bar last" style="height:100%"></div>
-      </div>
-    </div>
-
-    <!-- TSLA -->
-    <div class="pos-row cedear-grid">
-      <span class="pos-ticker">TSLA</span>
-      <span class="pos-qty">68</span>
-      <span class="pos-num">$734</span>
-      <span class="pos-num">$1.870</span>
-      <span class="pos-pnl pos col-val">+$1.136</span>
-      <span><span class="pct-pill pos">+154.6%</span></span>
-      <div class="spark">
-        <div class="spark-bar" style="height:40%"></div>
-        <div class="spark-bar" style="height:65%"></div>
-        <div class="spark-bar last" style="height:100%"></div>
-      </div>
-    </div>
-
-    <!-- SPY -->
-    <div class="pos-row cedear-grid">
-      <span class="pos-ticker">SPY</span>
-      <span class="pos-qty">79</span>
-      <span class="pos-num">$2.150</span>
-      <span class="pos-num">$2.745</span>
-      <span class="pos-pnl pos col-val">+$595</span>
-      <span><span class="pct-pill pos">+27.7%</span></span>
-      <div class="spark">
-        <div class="spark-bar" style="height:60%"></div>
-        <div class="spark-bar" style="height:70%"></div>
-        <div class="spark-bar" style="height:80%"></div>
-        <div class="spark-bar last" style="height:100%"></div>
-      </div>
-    </div>
-
-    <!-- GOOGL -->
-    <div class="pos-row cedear-grid">
-      <span class="pos-ticker">GOOGL</span>
-      <span class="pos-qty">151</span>
-      <span class="pos-num">$401</span>
-      <span class="pos-num">$825</span>
-      <span class="pos-pnl pos col-val">+$424</span>
-      <span><span class="pct-pill pos">+105.8%</span></span>
-      <div class="spark">
-        <div class="spark-bar" style="height:35%"></div>
-        <div class="spark-bar" style="height:65%"></div>
-        <div class="spark-bar last" style="height:100%"></div>
-      </div>
-    </div>
-
-    <!-- AAPL -->
-    <div class="pos-row cedear-grid">
-      <span class="pos-ticker">AAPL</span>
-      <span class="pos-qty">73</span>
-      <span class="pos-num">$549</span>
-      <span class="pos-num">$973</span>
-      <span class="pos-pnl pos col-val">+$424</span>
-      <span><span class="pct-pill pos">+77.1%</span></span>
-      <div class="spark">
-        <div class="spark-bar" style="height:50%"></div>
-        <div class="spark-bar" style="height:60%"></div>
-        <div class="spark-bar" style="height:75%"></div>
-        <div class="spark-bar last" style="height:100%"></div>
-      </div>
-    </div>
-
-    <!-- XOM -->
-    <div class="pos-row cedear-grid">
-      <span class="pos-ticker">XOM</span>
-      <span class="pos-qty">8</span>
-      <span class="pos-num">$85</span>
-      <span class="pos-num">$128</span>
-      <span class="pos-pnl pos col-val">+$43</span>
-      <span><span class="pct-pill pos">+51.2%</span></span>
-      <div class="spark">
-        <div class="spark-bar last" style="height:100%"></div>
-      </div>
-    </div>
-
-    <!-- MELI -->
-    <div class="pos-row cedear-grid">
-      <span class="pos-ticker">MELI</span>
-      <span class="pos-qty">11</span>
-      <span class="pos-num">$146</span>
-      <span class="pos-num">$160</span>
-      <span class="pos-pnl pos col-val">+$14</span>
-      <span><span class="pct-pill neutral">+9.8%</span></span>
-      <div class="spark">
-        <div class="spark-bar last" style="height:100%;background:var(--amber)"></div>
-      </div>
-    </div>
-
-    <!-- AMZN -->
-    <div class="pos-row cedear-grid">
-      <span class="pos-ticker">AMZN</span>
-      <span class="pos-qty">73</span>
-      <span class="pos-num">$100</span>
-      <span class="pos-num">$111</span>
-      <span class="pos-pnl pos col-val">+$11</span>
-      <span><span class="pct-pill neutral">+10.8%</span></span>
-      <div class="spark">
-        <div class="spark-bar last" style="height:100%;background:var(--amber)"></div>
-      </div>
-    </div>
-
-    <!-- MSFT -->
-    <div class="pos-row cedear-grid">
-      <span class="pos-ticker">MSFT</span>
-      <span class="pos-qty">13</span>
-      <span class="pos-num">$170</span>
-      <span class="pos-num">$182</span>
-      <span class="pos-pnl pos col-val">+$12</span>
-      <span><span class="pct-pill neutral">+6.8%</span></span>
-      <div class="spark">
-        <div class="spark-bar" style="height:100%"></div>
-        <div class="spark-bar last" style="height:85%;background:var(--amber)"></div>
-      </div>
-    </div>
-
-    <!-- PYPL -->
-    <div class="pos-row cedear-grid">
-      <span class="pos-ticker">PYPL</span>
-      <span class="pos-qty">24</span>
-      <span class="pos-num">$196</span>
-      <span class="pos-num">$138</span>
-      <span class="pos-pnl neg col-val">-$58</span>
-      <span><span class="pct-pill neg">-29.4%</span></span>
-      <div class="spark">
-        <div class="spark-bar" style="height:100%;background:var(--red);opacity:0.5"></div>
-        <div class="spark-bar last" style="height:70%;background:var(--red)"></div>
-      </div>
-    </div>
-
-    <!-- UNH -->
-    <div class="pos-row cedear-grid">
-      <span class="pos-ticker">UNH</span>
-      <span class="pos-qty">6</span>
-      <span class="pos-num">$88</span>
-      <span class="pos-num">$48</span>
-      <span class="pos-pnl neg col-val">-$40</span>
-      <span><span class="pct-pill neg">-45.5%</span></span>
-      <div class="spark">
-        <div class="spark-bar last" style="height:100%;background:var(--red)"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Acciones ARG + Cripto side by side -->
-  <div class="alloc-grid" style="margin-bottom:40px">
-
-    <div>
-      <div class="sec-title">Acciones argentinas</div>
-      <div class="positions-card" style="margin-bottom:0">
-        <div class="pos-header simple-grid">
-          <span>Ticker</span><span>Qty</span><span>Invertido</span><span>Valor USD</span><span>P&L</span><span>Retorno</span>
-        </div>
-        <div class="pos-row simple-grid">
-          <span class="pos-ticker">YPFD</span>
-          <span class="pos-qty">6</span>
-          <span class="pos-num">$104</span>
-          <span class="pos-num">$240</span>
-          <span class="pos-pnl pos">+$136</span>
-          <span><span class="pct-pill pos">+130.9%</span></span>
-        </div>
-        <div class="pos-row simple-grid">
-          <span class="pos-ticker">PAMP</span>
-          <span class="pos-qty">50</span>
-          <span class="pos-num">$99</span>
-          <span class="pos-num">$172</span>
-          <span class="pos-pnl pos">+$73</span>
-          <span><span class="pct-pill pos">+73.6%</span></span>
-        </div>
-        <div class="pos-row simple-grid">
-          <span class="pos-ticker">CRES</span>
-          <span class="pos-qty">102</span>
-          <span class="pos-num">$101</span>
-          <span class="pos-num">$127</span>
-          <span class="pos-pnl pos">+$26</span>
-          <span><span class="pct-pill pos">+25.0%</span></span>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="sec-title">Criptomonedas</div>
-      <div class="positions-card" style="margin-bottom:0">
-        <div class="pos-header simple-grid">
-          <span>Ticker</span><span>Qty</span><span>Invertido</span><span>Valor USD</span><span>P&L</span><span>Retorno</span>
-        </div>
-        <div class="pos-row simple-grid">
-          <span class="pos-ticker">BTC</span>
-          <span class="pos-qty" style="font-size:10px">0.0208</span>
-          <span class="pos-num">$1.020</span>
-          <span class="pos-num">$1.491</span>
-          <span class="pos-pnl pos">+$471</span>
-          <span><span class="pct-pill pos">+46.2%</span></span>
-        </div>
-        <div class="pos-row simple-grid">
-          <span class="pos-ticker">ETH</span>
-          <span class="pos-qty" style="font-size:10px">0.1553</span>
-          <span class="pos-num">$480</span>
-          <span class="pos-num">$331</span>
-          <span class="pos-pnl neg">-$149</span>
-          <span><span class="pct-pill neg">-31.1%</span></span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- GD35 -->
-  <div class="sec-title">Bonos soberanos</div>
-  <div class="gd35-card">
-    <div>
-      <div class="gd35-title">GD35</div>
-      <div class="gd35-sub">Global 2035 · 3 tranches</div>
-    </div>
-    <div class="gd35-stat">
-      <div class="gd35-stat-label">Nominales</div>
-      <div class="gd35-stat-val">1.670</div>
-    </div>
-    <div class="gd35-stat">
-      <div class="gd35-stat-label">Total invertido</div>
-      <div class="gd35-stat-val">$617 USD</div>
-    </div>
-    <div class="gd35-stat">
-      <div class="gd35-stat-label">1ª tranche</div>
-      <div class="gd35-stat-val">568 · 19/12/23</div>
-    </div>
-    <div class="gd35-stat">
-      <div class="gd35-stat-label">2ª tranche</div>
-      <div class="gd35-stat-val">650 · 22/1/24</div>
-    </div>
-    <div class="gd35-stat">
-      <div class="gd35-stat-label">3ª tranche</div>
-      <div class="gd35-stat-val">452 · 5/2/24</div>
-    </div>
-    <div class="gd35-note">
-      <strong>⚠ Valor actual sin calcular.</strong> El GD35 cotiza en USD por cada 100 VN (valor nominal). Con 1.670 nominales y precio actual ~$67/100VN, el valor estimado es <strong>~$1.119 USD</strong> — una ganancia de +$502 sobre los $617 invertidos (+81%). Para calcular en tu planilla usá: <strong>=(Qty * PrecioUSD / 100)</strong>
-    </div>
-  </div>
-
-  <footer>
-    PLANILLA DEL ÉXITO · DATOS AL MOMENTO DE ÚLTIMA ACTUALIZACIÓN · NO CONSTITUYE ASESORAMIENTO FINANCIERO
-  </footer>
+  <div id="error">⚠ No se pudieron cargar los datos.<br>Verificá que la planilla esté publicada.</div>
+  <div id="dashboard"></div>
 </div>
+<script>
+const URL_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaPZRXtH69O3uJiDTtFhmDYN-CEfsD22JL694qnLwIR3OjLJ-yBhSHCcRbNuyTjIWu-8MNqkIDd5qL/pub?gid=0&single=true&output=csv';
+
+const S = {
+  btc: { qty:0.02082321, inv:1020, val:1491.41 },
+  eth: { qty:0.15534269, inv:480, val:330.71 },
+  cedears: [
+    {t:'NVDA',qty:350,inv:1364.62,val:2789.99,pct:104.45},
+    {t:'TSLA',qty:68,inv:734.49,val:1870.00,pct:154.60},
+    {t:'SPY',qty:79,inv:2149.86,val:2744.68,pct:27.67},
+    {t:'GOOGL',qty:151,inv:400.82,val:825.10,pct:105.85},
+    {t:'AAPL',qty:73,inv:549.31,val:972.99,pct:77.13},
+    {t:'XOM',qty:8,inv:84.62,val:127.94,pct:51.19},
+    {t:'MELI',qty:11,inv:146.04,val:160.29,pct:9.76},
+    {t:'AMZN',qty:73,inv:100.02,val:110.80,pct:10.78},
+    {t:'MSFT',qty:13,inv:169.89,val:181.53,pct:6.85},
+    {t:'PYPL',qty:24,inv:195.58,val:138.00,pct:-29.44},
+    {t:'UNH',qty:6,inv:87.94,val:47.89,pct:-45.54},
+  ],
+  acc: [
+    {t:'YPFD',qty:6,inv:103.85,val:239.79,pct:130.90},
+    {t:'PAMP',qty:50,inv:99.27,val:172.32,pct:73.59},
+    {t:'CRES',qty:102,inv:101.28,val:126.63,pct:25.03},
+  ]
+};
+
+const $ = n => n >= 0 ? `$${Math.abs(n) >= 1000 ? Math.abs(n).toLocaleString('es-AR',{maximumFractionDigits:0}) : Math.abs(n).toFixed(0)}` : `-$${Math.abs(n) >= 1000 ? Math.abs(n).toLocaleString('es-AR',{maximumFractionDigits:0}) : Math.abs(n).toFixed(0)}`;
+const pill = p => {
+  const c = p > 10 ? 'pill-pos' : p < 0 ? 'pill-neg' : 'pill-neu';
+  return `<span class="pill ${c}">${p > 0 ? '+' : ''}${p.toFixed(1)}%</span>`;
+};
+const pc = n => n >= 0 ? 'pos-c' : 'neg-c';
+const sign = n => n >= 0 ? '+' : '';
+
+function card(p) {
+  const pnl = p.val - p.inv;
+  return `<div class="pos-card">
+    <div class="pos-card-left">
+      <span class="ticker">${p.t}</span>
+      <span class="inv-detail">Inv <span>${$(p.inv)}</span> &nbsp;·&nbsp; ${p.qty} u</span>
+    </div>
+    <div class="pos-card-right">
+      <span class="val-main ${pc(pnl)}">${$(p.val)}</span>
+      <span class="val-pnl ${pc(pnl)}">${sign(pnl)}${$(pnl)}</span>
+      ${pill(p.pct)}
+    </div>
+  </div>`;
+}
+
+function rowD(p) {
+  const pnl = p.val - p.inv;
+  const c = pc(pnl);
+  return `<div class="pos-row-d">
+    <span class="ticker">${p.t}</span>
+    <span class="qty">${p.qty}</span>
+    <span class="num">${$(p.inv)}</span>
+    <span class="num">${$(p.val)}</span>
+    <span class="num ${c}" style="font-weight:700">${sign(pnl)}${$(pnl)}</span>
+    ${pill(p.pct)}
+  </div>`;
+}
+
+const thead = `<div class="pos-header"><span>Ticker</span><span>Qty</span><span>Invertido</span><span>Valor</span><span>P&L</span><span>%</span></div>`;
+
+function parseLive(csv) {
+  const live = {};
+  for (const line of csv.split('\n')) {
+    const c = line.split(',').map(x => x.replace(/"/g,'').trim());
+    if (c[0]==='Bitcoin') live.btc = parseFloat(c[1].replace(/[$, ]/g,''));
+    if (c[0]==='Ethereum') live.eth = parseFloat(c[1].replace(/[$, ]/g,''));
+    if (c[0]==='Total' && c[1] && !live.tv) { const v=parseFloat(c[1].replace(/[^0-9.]/g,'')); if(!isNaN(v)) live.tv=v; }
+    if (c[0]==='Invested' && c[1] && !live.ti) { const v=parseFloat(c[1].replace(/[^0-9.]/g,'')); if(!isNaN(v)) live.ti=v; }
+  }
+  return live;
+}
+
+function render(live) {
+  const btcV = live.btc ? S.btc.qty * live.btc : S.btc.val;
+  const ethV = live.eth ? S.eth.qty * live.eth : S.eth.val;
+  const btcP = (btcV/S.btc.inv-1)*100;
+  const ethP = (ethV/S.eth.inv-1)*100;
+  const tv = live.tv || 12330.10;
+  const ti = live.ti || 7787.59;
+  const pnl = tv - ti;
+  const pct = (tv/ti-1)*100;
+  const now = new Date().toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short'});
+  const kc = pct >= 0 ? 'g' : 'r';
+
+  const crypto = [
+    {t:'BTC', qty:S.btc.qty.toFixed(5), inv:S.btc.inv, val:btcV, pct:btcP},
+    {t:'ETH', qty:S.eth.qty.toFixed(4), inv:S.eth.inv, val:ethV, pct:ethP},
+  ];
+
+  document.getElementById('dashboard').innerHTML = `
+<header>
+  <div class="logo-area">
+    <h1>Planilla del <span>Éxito</span></h1>
+    <p>PORTFOLIO TRACKER · TIEMPO REAL</p>
+  </div>
+  <div class="header-right">
+    <div class="header-badge">IOL · BYMA · CRYPTO</div>
+    <div class="last-update">${now}</div>
+  </div>
+</header>
+
+<div class="sec-title">Resumen general</div>
+<div class="kpi-grid">
+  <div class="kpi g"><div class="kpi-label">Valor total</div><div class="kpi-val g">${$(tv)}</div><div class="kpi-sub">USD tipo MEP</div></div>
+  <div class="kpi p"><div class="kpi-label">Invertido</div><div class="kpi-val p">${$(ti)}</div><div class="kpi-sub">USD histórico</div></div>
+  <div class="kpi g"><div class="kpi-label">Ganancia</div><div class="kpi-val g">+${$(pnl)}</div><div class="kpi-sub">USD netos</div></div>
+  <div class="kpi ${kc}"><div class="kpi-label">Retorno</div><div class="kpi-val ${kc}">${pct>=0?'+':''}${pct.toFixed(1)}%</div><div class="kpi-sub">desde origen</div></div>
+</div>
+
+<div class="sec-title">CEDEARs</div>
+<div class="positions-card">
+  <div class="pos-cards">${S.cedears.map(card).join('')}</div>
+  <div class="pos-table">${thead}${S.cedears.map(rowD).join('')}</div>
+</div>
+
+<div class="two-col">
+  <div>
+    <div class="sec-title">Acciones argentinas</div>
+    <div class="positions-card" style="margin-bottom:0">
+      <div class="pos-cards">${S.acc.map(card).join('')}</div>
+      <div class="pos-table">${thead}${S.acc.map(rowD).join('')}</div>
+    </div>
+  </div>
+  <div>
+    <div class="sec-title">Criptomonedas</div>
+    <div class="positions-card" style="margin-bottom:0">
+      <div class="pos-cards">${crypto.map(card).join('')}</div>
+      <div class="pos-table">${thead}${crypto.map(rowD).join('')}</div>
+    </div>
+  </div>
+</div>
+
+<div class="sec-title">Bonos soberanos</div>
+<div class="gd35-card">
+  <div class="gd35-grid">
+    <div><div class="gd35-stat-label">Bono</div><div class="gd35-stat-val" style="color:var(--amber);font-size:18px">GD35</div></div>
+    <div><div class="gd35-stat-label">Nominales</div><div class="gd35-stat-val">1.670</div></div>
+    <div><div class="gd35-stat-label">Invertido</div><div class="gd35-stat-val">$617 USD</div></div>
+    <div><div class="gd35-stat-label">Valor est.</div><div class="gd35-stat-val" style="color:var(--green)">~$1.119 USD</div></div>
+  </div>
+  <div class="gd35-note">
+    <strong>Fix en tu Sheet:</strong> GD35 cotiza por cada 100 VN. 1.670 nominales × ~$67 ≈ <strong>$1.119 USD (+81%)</strong>.<br>
+    Fórmula: <strong>=(cantidad * precio_GD35) / 100</strong>
+  </div>
+</div>
+
+<footer>
+  PLANILLA DEL ÉXITO · DATOS AL RECARGAR · PRECIOS DESDE GOOGLE SHEET<br>
+  NO CONSTITUYE ASESORAMIENTO FINANCIERO · SOLO USO PERSONAL
+</footer>`;
+
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+}
+
+fetch(URL_CSV)
+  .then(r => { if(!r.ok) throw 0; return r.text(); })
+  .then(csv => render(parseLive(csv)))
+  .catch(() => render({}));
+</script>
 </body>
 </html>
