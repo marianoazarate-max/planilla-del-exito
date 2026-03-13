@@ -489,10 +489,23 @@ function parseNum(s) {
   return parseFloat(clean);
 }
 
+function splitCSV(line) {
+  const result = [];
+  let cur = '', inQuote = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') { inQuote = !inQuote; }
+    else if (ch === ',' && !inQuote) { result.push(cur.trim()); cur = ''; }
+    else { cur += ch; }
+  }
+  result.push(cur.trim());
+  return result;
+}
+
 function parseLive(csv) {
   const live = {};
   for (const line of csv.split('\n')) {
-    const c = line.split(',').map(x => x.replace(/"/g,'').trim());
+    const c = splitCSV(line);
     if (c[0] === 'Bitcoin')  live.btc = parseFloat(c[1].replace(/[$, ]/g,''));
     if (c[0] === 'Ethereum') live.eth = parseFloat(c[1].replace(/[$, ]/g,''));
     if (c[0] === 'Total'    && c[1] && !live.tv) { const v = parseNum(c[1]); if (!isNaN(v)) live.tv = v; }
